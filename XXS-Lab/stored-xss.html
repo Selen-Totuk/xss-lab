@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stored XSS</title>
+</head>
+<body>
+  <h2>Stored XSS Testi</h2>
+  <form id="commentForm">
+    <label>Yorum: <input type="text" id="commentInput"></label>
+    <button type="submit">Kaydet</button>
+  </form>
+  <hr>
+  <div id="comments">
+    <h3>Yorumlar:</h3>
+  </div>
+
+  <script>
+    const form = document.getElementById("commentForm");
+    const input = document.getElementById("commentInput");
+    const commentsDiv = document.getElementById("comments");
+
+    const stored = JSON.parse(localStorage.getItem("comments")) || [];
+
+    function renderComments() {
+      commentsDiv.innerHTML = "<h3>Yorumlar:</h3>";
+      stored.forEach(comment => {
+        const p = document.createElement("p");
+        // Filtre yok! Açık burada:
+        p.innerHTML = comment;
+        commentsDiv.appendChild(p);
+      });
+    }
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      stored.push(input.value);
+      localStorage.setItem("comments", JSON.stringify(stored));
+      renderComments();
+      input.value = "";
+    };
+
+    renderComments();
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reflected XSS (Safe)</title>
+</head>
+<body>
+  <h2>Reflected XSS (Güvenli)</h2>
+  <form method="GET">
+    <label>Adınızı girin: <input type="text" name="name"></label>
+    <button type="submit">Gönder</button>
+  </form>
+  <hr>
+  <p>Merhaba: 
+    <span id="output"></span>
+  </p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    if (name) {
+      const safeText = document.createTextNode(name); // XSS engellendi
+      document.getElementById("output").appendChild(safeText);
+    }
+  </script>
+</body>
+</html>
+
+
+<form method="GET">
+  <label>Adınızı girin: <input type="text" name="name" id="inputName"></label>
+  <button type="submit">Gönder</button>
+
+  <br><br>
+  <label>Hazır Payload: 
+    <select id="payloads">
+      <option value="">Seç</option>
+      <option value="&lt;script&gt;alert('XSS')&lt;/script&gt;">script tag</option>
+      <option value="&lt;img src=x onerror=alert('XSS')&gt;">img onerror</option>
+      <option value="&lt;svg onload=alert('XSS')&gt;">svg onload</option>
+    </select>
+  </label>
+</form>
+
+<script>
+  document.getElementById("payloads").addEventListener("change", function () {
+    document.getElementById("inputName").value = this.value;
+  });
+</script>
